@@ -14,18 +14,18 @@ CrabDB 依赖 BerkeleyDB，MessagePack 和 Tiny C Compiler。
 
 在 Ubuntu 12.04 及以上版本可以直接安装 BerkeleyDB 和 MessagePack 软件包：
 
-	sudo apt-get install libdb5.1-dev libmsgpack-dev
+    sudo apt-get install libdb5.1-dev libmsgpack-dev
 
 给 Tiny C Compiler 打补丁并安装：
 
-	wget http://download.savannah.nongnu.org/releases/tinycc/tcc-0.9.25.tar.bz2
-	tar jxf tcc-0.9.25.tar.bz2
-	cd tcc-0.9.25/
-	patch -p1 <patches/fix-libtcc-memory-leak.patch
-	./configure
-	make
-	sudo make install
-	cd ..
+    wget http://download.savannah.nongnu.org/releases/tinycc/tcc-0.9.25.tar.bz2
+    tar jxf tcc-0.9.25.tar.bz2
+    cd tcc-0.9.25/
+    patch -p1 <patches/fix-libtcc-memory-leak.patch
+    ./configure
+    make
+    sudo make install
+    cd ..
 
 然后编译和安装 CrabDB：
 
@@ -41,7 +41,7 @@ CrabDB 依赖 BerkeleyDB，MessagePack 和 Tiny C Compiler。
     import pycrab
     crab = pycrab.Connection(host='127.0.0.1')
 
-	# 这个 T 对象用于编写 Python 风格的查询表达式，请参见下面的查询示例。
+    # 这个 T 对象用于编写 Python 风格的查询表达式，请参见下面的查询示例。
     T = pycrab.Record()
 
 ### 建立桶与结构
@@ -55,8 +55,8 @@ CrabDB 中的数据被存储在多个『桶』中。每个『桶』里包含相�
 首先我们建立一个叫 `user_photo` 的桶，它以『用户 id』作为表的键，每个表以『照片 id』作为主键存储该用户发表的图片相关信息。
 
     crab.user_photo.set_fields([
-	    pycrab.Field(58, 'photo_id', is_primary_key=True),  # 图片 id
-	    pycrab.Field(56, 'location_id'),                    # 地点 id
+        pycrab.Field(58, 'photo_id', is_primary_key=True),  # 图片 id
+        pycrab.Field(56, 'location_id'),                    # 地点 id
         pycrab.Field(1, 'is_private', signed=True),         # 是否为私密照片
         pycrab.Field(32, 'created'),                        # 创建时间
     ])
@@ -68,7 +68,7 @@ CrabDB 中的数据被存储在多个『桶』中。每个『桶』里包含相�
     user_id = 5
     table = crab.user_photo[user_id]
     # 插入一些示例数据
-	table.insert({'photo_id': 100001, 'location_id': 101, 'is_private':  0, 'created': 130000001})
+    table.insert({'photo_id': 100001, 'location_id': 101, 'is_private':  0, 'created': 130000001})
     table.insert({'photo_id': 100002, 'location_id': 102, 'is_private':  0, 'created': 130000002})
     table.insert({'photo_id': 100003, 'location_id': 103, 'is_private': -1, 'created': 130000003})
     table.insert({'photo_id': 100004, 'location_id': 104, 'is_private':  0, 'created': 130000004})
@@ -83,24 +83,23 @@ CrabDB 会将查询条件编译后再运行，以提高全表扫描的性能。
 
     # 查询最近的 10 条记录
     for r in crab.user_photo_test[user_id].find().sort(-T.created).limit(10):
-	    print r
+        print r
 
     # 查询由 user_id 发布的在 [101, 102, 103, 104] 这四个地点的非私密照片，按时间倒序排序
     location_ids = [101, 102, 103, 104]
     table = crab.user_photo_test[user_id]
     query = table.find(T.location_id.in_(location_ids) & ~T.is_private)
     for r in query.sort(-T.created):
-	    print r
+        print r
 
     # 查询不同的地点
     for r in crab.user_photo_test[user_id].find().group(T.location_id):
         print r
 
 ### 更新
-	
-	# 将 photo_id 为 100005 的照片设置为私密
+    
+    # 将 photo_id 为 100005 的照片设置为私密
     crab.user_photo_test[user_id].find({'photo_id': 100005}).update({'is_private': -1})
 
 ### 删除
     crab.user_photo_test[user_id].remove({'photo_id': 100004})
-
