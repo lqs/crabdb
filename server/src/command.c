@@ -887,8 +887,7 @@ int command_insert(struct request *request, msgpack_object o, msgpack_packer *re
         struct bucket *bucket = bucket_get(bucket_name, CAN_RETURN_NULL);
         
         if (!bucket) {
-            /* TODO: return CRABDB_ERROR_INSERT_TABLE; */
-            return 13;
+            return CRABDB_ERROR_NO_SUCH_BUCKET;
         }
         
         struct table *table = bucket_get_table(bucket, table_id, 0);
