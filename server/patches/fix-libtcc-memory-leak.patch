@@ -1,0 +1,24 @@
+diff --git a/libtcc.c b/libtcc.c
+index ade77c0..e0bc851 100644
+--- a/libtcc.c
++++ b/libtcc.c
+@@ -1891,6 +1891,7 @@ void tcc_delete(TCCState *s1)
+     dynarray_reset(&s1->include_paths, &s1->nb_include_paths);
+     dynarray_reset(&s1->sysinclude_paths, &s1->nb_sysinclude_paths);
+ 
++    tcc_free(s1->got_offsets);
+     tcc_free(s1);
+ }
+ 
+diff --git a/tccelf.c b/tccelf.c
+index 4020e24..f04b040 100644
+--- a/tccelf.c
++++ b/tccelf.c
+@@ -1995,7 +1995,6 @@ int elf_output_file(TCCState *s1, const char *filename)
+     tcc_free(s1->symtab_to_dynsym);
+     tcc_free(section_order);
+     tcc_free(phdr);
+-    tcc_free(s1->got_offsets);
+     return ret;
+ }
+ 
